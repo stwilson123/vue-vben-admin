@@ -77,6 +77,10 @@ export interface TransitionSetting {
   openPageLoading: boolean;
   // Whether to open the top progress bar
   openNProgress: boolean;
+
+  appTitle: string;
+
+  appShortName: string;
 }
 
 export interface ProjectConfig {
@@ -133,8 +137,24 @@ export interface ProjectConfig {
   closeMessageOnSwitch: boolean;
   // Whether to cancel the http request that has been sent but not responded when switching the interface.
   removeAllHttpPending: boolean;
+
+  loginSetting: loginSetting;
+
+  pageUrl: pageUrl;
+
+  appTitle: string;
+
+  appShortName: string;
 }
 
+export interface loginSetting {
+  url: string;
+}
+
+export interface pageUrl {
+  login: string;
+  dashbroad: string;
+}
 export interface GlobConfig {
   // Site title
   title: string;

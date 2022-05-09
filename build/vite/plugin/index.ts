@@ -15,7 +15,7 @@ import { configVisualizerConfig } from './visualizer';
 import { configThemePlugin } from './theme';
 import { configImageminPlugin } from './imagemin';
 import { configSvgIconsPlugin } from './svgSprite';
-
+// import { configAntvModularizedImport } from './antvModularizedImport';
 export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
   const {
     VITE_USE_IMAGEMIN,
@@ -78,5 +78,6 @@ export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
     vitePlugins.push(configPwaConfig(viteEnv));
   }
 
+  // vitePlugins.push(configAntvModularizedImport());
   return vitePlugins;
 }

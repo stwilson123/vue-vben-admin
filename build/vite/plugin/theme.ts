@@ -15,11 +15,13 @@ import { getThemeColors, generateColors } from '../../config/themeConfig';
 import { generateModifyVars } from '../../generate/generateModifyVars';
 
 export function configThemePlugin(isBuild: boolean): PluginOption[] {
+  const sArray: string[] = [];
   const colors = generateColors({
     mixDarken,
     mixLighten,
     tinycolor,
   });
+
   const plugin = [
     viteThemePlugin({
       resolveSelector: (s) => {
@@ -41,6 +43,12 @@ export function configThemePlugin(isBuild: boolean): PluginOption[] {
               return s;
             }
         }
+        debugger;
+        if (!sArray.includes(s)) {
+          sArray.push(s);
+          console.log(sArray);
+        }
+        console.log('[data-theme');
         return s.startsWith('[data-theme') ? s : `[data-theme] ${s}`;
       },
       colorVariables: [...getThemeColors(), ...colors],
@@ -85,5 +93,18 @@ export function configThemePlugin(isBuild: boolean): PluginOption[] {
     }),
   ];
 
+  //todo
+  plugin[0].forEach(function (item) {
+    //对vite:theme插件特殊配置
+    if ('vite:theme' === item.name) {
+      //console.log(item);
+      // 打包时去除enforce: "post"，vite 2.6.x适配，否则生成app-theme-style为空，因为async transform(code, id) {的code没有正确获取
+      if (isBuild) {
+        delete item.enforce;
+      }
+      delete item.enforce;
+      //console.log(item);
+    }
+  });
   return plugin as unknown as PluginOption[];
 }

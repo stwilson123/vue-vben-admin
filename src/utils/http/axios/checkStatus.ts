@@ -6,6 +6,7 @@ import { useI18n } from '/@/hooks/web/useI18n';
 import { useUserStoreWithOut } from '/@/store/modules/user';
 import projectSetting from '/@/settings/projectSetting';
 import { SessionTimeoutProcessingEnum } from '/@/enums/appEnum';
+import { bool } from 'vue-types';
 
 const { createMessage, createErrorModal } = useMessage();
 const error = createMessage.error!;
@@ -15,7 +16,7 @@ export function checkStatus(
   status: number,
   msg: string,
   errorMessageMode: ErrorMessageMode = 'message',
-): void {
+) {
   const { t } = useI18n();
   const userStore = useUserStoreWithOut();
   let errMessage = '';
@@ -71,10 +72,15 @@ export function checkStatus(
   }
 
   if (errMessage) {
+    let handled = false;
     if (errorMessageMode === 'modal') {
       createErrorModal({ title: t('sys.api.errorTip'), content: errMessage });
+      handled = true;
     } else if (errorMessageMode === 'message') {
       error({ content: errMessage, key: `global_error_message_status_${status}` });
+      handled = true;
     }
+    return { error: errMessage, handled: handled };
   }
+  return { error: errMessage, handled: false };
 }

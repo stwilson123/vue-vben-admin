@@ -8,6 +8,12 @@
       "url": "http://localhost:3100",
       "webRoot": "${workspaceFolder}/src",
       "sourceMaps": true
-    }
+    },
+    {
+      "command": "npm run serve",
+      "name": "Run npm serve",
+      "request": "launch",
+      "type": "node-terminal"
+  },
   ]
 }

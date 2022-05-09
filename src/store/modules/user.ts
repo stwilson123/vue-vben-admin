@@ -16,7 +16,7 @@ import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { isArray } from '/@/utils/is';
 import { h } from 'vue';
-
+import { usePedestal } from '/@/hooks/usePedestal';
 interface UserState {
   userInfo: Nullable<UserInfo>;
   token?: string;
@@ -102,6 +102,7 @@ export const useUserStore = defineStore({
     },
     async afterLoginAction(goHome?: boolean): Promise<GetUserInfoModel | null> {
       if (!this.getToken) return null;
+
       // get user info
       const userInfo = await this.getUserInfoAction();
 
@@ -124,6 +125,13 @@ export const useUserStore = defineStore({
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
       if (!this.getToken) return null;
+      debugger;
+      // const pedestal = usePedestal();
+      // const pedestalUserHook = pedestal.get().hooks.useUserHook();
+      // let userInfo = pedestalUserHook.userListener?.getUserInfoAction
+      //   ? await pedestalUserHook.userListener?.getUserInfoAction()
+      //   : await getUserInfo();
+      // userInfo = userInfo ?? ({} as UserInfo);
       const userInfo = await getUserInfo();
       const { roles = [] } = userInfo;
       if (isArray(roles)) {
@@ -134,6 +142,7 @@ export const useUserStore = defineStore({
         this.setRoleList([]);
       }
       this.setUserInfo(userInfo);
+
       return userInfo;
     },
     /**

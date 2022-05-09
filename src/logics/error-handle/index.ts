@@ -9,7 +9,10 @@ import { useErrorLogStoreWithOut } from '/@/store/modules/errorLog';
 import { ErrorTypeEnum } from '/@/enums/exceptionEnum';
 import { App } from 'vue';
 import projectSetting from '/@/settings/projectSetting';
-
+import { event } from '@ice/stark-data';
+import { useMessage } from '/@/hooks/web/useMessage';
+import { useI18n } from '/@/hooks/web/useI18n';
+import { warn } from '/@/utils/log';
 /**
  * Handling error stack information
  * @param error
@@ -161,6 +164,17 @@ function registerResourceErrorHandler() {
   );
 }
 
+function registerSubappErrorListener() {
+  const message = useMessage();
+  const { t } = useI18n();
+  event.on('appError', (error: ErrorLogInfo) => {
+    warn(t('sys.api.errorTip'), error);
+    message.createErrorModal({
+      title: t('sys.api.errorTip'),
+      content: error.message + '\r\n' + error.detail,
+    });
+  });
+}
 /**
  * Configure global error handling
  * @param app
@@ -181,4 +195,6 @@ export function setupErrorHandle(app: App) {
 
   // Static resource exception
   registerResourceErrorHandler();
+
+  registerSubappErrorListener();
 }

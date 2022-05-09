@@ -161,7 +161,7 @@ const setting: ProjectConfig = {
   showBreadCrumbIcon: false,
 
   // Use error-handler-plugin
-  useErrorHandle: false,
+  useErrorHandle: true, //init false
 
   // Whether to open back to top
   useOpenBackTop: true,
@@ -175,6 +175,17 @@ const setting: ProjectConfig = {
   // Whether to cancel the http request that has been sent but not responded when switching the interface.
   // If it is enabled, I want to overwrite a single interface. Can be set in a separate interface
   removeAllHttpPending: false,
+
+  loginSetting: {
+    url: '/system/login',
+  },
+  pageUrl: {
+    login: '/system/login',
+    dashbroad: '/system/dashboard',
+  },
+  appTitle: '',
+
+  appShortName: '',
 };
 
 export default setting;

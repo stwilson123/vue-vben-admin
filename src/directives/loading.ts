@@ -1,7 +1,7 @@
 import { createLoading } from '/@/components/Loading';
 import type { Directive, App } from 'vue';
 
-const loadingDirective: Directive = {
+export const loadingDirective: Directive = {
   mounted(el, binding) {
     const tip = el.getAttribute('loading-tip');
     const background = el.getAttribute('loading-background');

@@ -20,6 +20,10 @@
           htmlRoot.setAttribute('data-theme', theme);
           theme = htmlRoot = null;
         }
+        window.localStorage.setItem(
+          '__MICRO__APP__',
+          `[ { "name": "system", "entry": "//localhost:9004/" }]`,
+        );
       })();
     </script>
     <div id="app">

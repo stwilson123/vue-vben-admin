@@ -22,11 +22,17 @@ import { Persistent } from '/@/utils/cache/persistent';
 import { deepMerge } from '/@/utils';
 import { ThemeEnum } from '/@/enums/appEnum';
 
+import { useGlobSetting } from '/@/hooks/setting';
 // Initial project configuration
 export function initAppConfigStore() {
   const localeStore = useLocaleStore();
   const appStore = useAppStore();
+  const globSetting = useGlobSetting();
   let projCfg: ProjectConfig = Persistent.getLocal(PROJ_CFG_KEY) as ProjectConfig;
+  projCfg = deepMerge(projectSetting, {
+    appTitle: globSetting.title,
+    appShortName: globSetting.shortName,
+  });
   projCfg = deepMerge(projectSetting, projCfg || {});
   const darkMode = appStore.getDarkMode;
   const {

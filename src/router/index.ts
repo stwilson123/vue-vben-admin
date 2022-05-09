@@ -1,9 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router';
 import type { App } from 'vue';
 
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import { basicRoutes } from './routes';
-
+// const basicRoutes = [];
 // 白名单应该包含基本静态路由
 const WHITE_NAME_LIST: string[] = [];
 const getRouteNames = (array: any[]) =>
@@ -15,7 +15,7 @@ getRouteNames(basicRoutes);
 
 // app router
 export const router = createRouter({
-  history: createWebHashHistory(import.meta.env.VITE_PUBLIC_PATH),
+  history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH),
   routes: basicRoutes as unknown as RouteRecordRaw[],
   strict: true,
   scrollBehavior: () => ({ left: 0, top: 0 }),

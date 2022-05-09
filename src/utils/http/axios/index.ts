@@ -18,7 +18,7 @@ import { useI18n } from '/@/hooks/web/useI18n';
 import { joinTimestamp, formatRequestDate } from './helper';
 import { useUserStoreWithOut } from '/@/store/modules/user';
 import { AxiosRetry } from '/@/utils/http/axios/axiosRetry';
-
+import { BlocksException } from '/@/exception/BlocksException';
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix;
 const { createMessage, createErrorModal } = useMessage();
@@ -44,11 +44,12 @@ const transform: AxiosTransform = {
     }
     // 错误的时候返回
 
-    const { data } = res;
-    if (!data) {
+    if (!res || !res.data) {
       // return '[HTTP] Request has no return value';
-      throw new Error(t('sys.api.apiRequestFailed'));
+      throw new BlocksException('', t('sys.api.apiRequestFailed'), { response: res });
     }
+    const { data } = res;
+
     //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
     const { code, result, message } = data;
 
@@ -81,8 +82,9 @@ const transform: AxiosTransform = {
     } else if (options.errorMessageMode === 'message') {
       createMessage.error(timeoutMsg);
     }
+    throw new BlocksException('', timeoutMsg || t('sys.api.apiRequestFailed'), { response: res });
 
-    throw new Error(timeoutMsg || t('sys.api.apiRequestFailed'));
+    // throw new Error(timeoutMsg || t('sys.api.apiRequestFailed'));
   },
 
   // 请求之前处理config
@@ -168,7 +170,6 @@ const transform: AxiosTransform = {
     const msg: string = response?.data?.error?.message ?? '';
     const err: string = error?.toString?.() ?? '';
     let errMessage = '';
-
     try {
       if (code === 'ECONNABORTED' && message.indexOf('timeout') !== -1) {
         errMessage = t('sys.api.apiTimeoutMessage');
@@ -178,19 +179,21 @@ const transform: AxiosTransform = {
       }
 
       if (errMessage) {
+        let handled = false;
         if (errorMessageMode === 'modal') {
           createErrorModal({ title: t('sys.api.errorTip'), content: errMessage });
+          handled = true;
         } else if (errorMessageMode === 'message') {
           createMessage.error(errMessage);
+          handled = true;
         }
-        return Promise.reject(error);
+        return { error: errMessage, handled: handled };
       }
     } catch (error) {
       throw new Error(error as unknown as string);
     }
 
-    checkStatus(error?.response?.status, msg, errorMessageMode);
-
+    const handleError = checkStatus(error?.response?.status, msg, errorMessageMode);
     // 添加自动重试机制 保险起见 只针对GET请求
     const retryRequest = new AxiosRetry();
     const { isOpenRetry } = config.requestOptions.retryRequest;
@@ -198,11 +201,11 @@ const transform: AxiosTransform = {
       isOpenRetry &&
       // @ts-ignore
       retryRequest.retry(axiosInstance, error);
-    return Promise.reject(error);
+    return handleError;
   },
 };
 
-function createAxios(opt?: Partial<CreateAxiosOptions>) {
+export function createAxios(opt?: Partial<CreateAxiosOptions>) {
   return new VAxios(
     deepMerge(
       {

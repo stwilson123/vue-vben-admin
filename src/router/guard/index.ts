@@ -15,6 +15,7 @@ import { createParamMenuGuard } from './paramMenuGuard';
 
 // Don't change the order of creation
 export function setupRouterGuard(router: Router) {
+  createPageJumpTokenGuard(router);
   createPageGuard(router);
   createPageLoadingGuard(router);
   createHttpGuard(router);
@@ -24,6 +25,23 @@ export function setupRouterGuard(router: Router) {
   createPermissionGuard(router);
   createParamMenuGuard(router); // must after createPermissionGuard (menu has been built.)
   createStateGuard(router);
+}
+
+function createPageJumpTokenGuard(router: Router) {
+  const userStore = useUserStoreWithOut();
+
+  router.beforeEach(async (to) => {
+    if (!userStore.getToken) {
+      try {
+        const pageJumpToken = history?.state?.token;
+        if (pageJumpToken) {
+          userStore.setToken(pageJumpToken);
+        }
+      } catch (error) {}
+    }
+
+    return true;
+  });
 }
 
 /**

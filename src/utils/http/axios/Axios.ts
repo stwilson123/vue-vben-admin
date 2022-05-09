@@ -8,7 +8,7 @@ import { isFunction } from '/@/utils/is';
 import { cloneDeep } from 'lodash-es';
 import { ContentTypeEnum } from '/@/enums/httpEnum';
 import { RequestEnum } from '/@/enums/httpEnum';
-
+import { BlocksException } from '/@/exception/BlocksException';
 export * from './axiosTransform';
 
 /**
@@ -113,7 +113,10 @@ export class VAxios {
       isFunction(responseInterceptorsCatch) &&
       this.axiosInstance.interceptors.response.use(undefined, (error) => {
         // @ts-ignore
-        responseInterceptorsCatch(this.axiosInstance, error);
+        debugger;
+        const handleMsg = responseInterceptorsCatch(this.axiosInstance, error);
+        if (handleMsg && handleMsg.error && !handleMsg.handled)
+          throw new BlocksException('', handleMsg.error, error);
       });
   }
 
@@ -211,7 +214,7 @@ export class VAxios {
       this.axiosInstance
         .request<any, AxiosResponse<Result>>(conf)
         .then((res: AxiosResponse<Result>) => {
-          if (transformRequestHook && isFunction(transformRequestHook)) {
+          if (res && transformRequestHook && isFunction(transformRequestHook)) {
             try {
               const ret = transformRequestHook(res, opt);
               resolve(ret);
@@ -223,6 +226,7 @@ export class VAxios {
           resolve(res as unknown as Promise<T>);
         })
         .catch((e: Error | AxiosError) => {
+          debugger;
           if (requestCatchHook && isFunction(requestCatchHook)) {
             reject(requestCatchHook(e, opt));
             return;

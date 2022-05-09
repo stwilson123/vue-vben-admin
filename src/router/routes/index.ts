@@ -5,8 +5,9 @@ import { PAGE_NOT_FOUND_ROUTE, REDIRECT_ROUTE } from '/@/router/routes/basic';
 import { mainOutRoutes } from './mainOut';
 import { PageEnum } from '/@/enums/pageEnum';
 import { t } from '/@/hooks/web/useI18n';
+import { LAYOUT } from '/@/router/constant';
 
-const modules = import.meta.globEager('./modules/**/*.ts');
+const modules = {}; //import.meta.globEager('./modules/**/*.ts');
 
 const routeModuleList: AppRouteModule[] = [];
 
@@ -36,9 +37,56 @@ export const LoginRoute: AppRouteRecordRaw = {
   },
 };
 
+export const SystemLoginRoute: AppRouteRecordRaw = {
+  path: '/system/authentication/login',
+  name: 'system/login',
+  component: () => import('/@/views/sys/qiankun/index.vue'),
+  meta: {
+    title: t('routes.basic.login'),
+  },
+};
+
+// export const SystemDashboardRoute: AppRouteRecordRaw = {
+//   path: '/system/:path(.*)*',
+//   name: 'system/dashboard',
+//   component: () => import('/@/views/sys/qiankun/index.vue'),
+//   meta: {
+//     icon: 'ion:grid-outline',
+//     title: t('routes.dashboard.dashboard'),
+//   },
+// };
+
+export const systemRoute: AppRouteModule = {
+  path: '/system/:path(.*)*',
+  name: 'system',
+  component: LAYOUT,
+  //redirect: '/vue3/index',
+  meta: {
+    hideChildrenInMenu: true,
+    icon: 'simple-icons:about-dot-me',
+    title: t('routes.dashboard.about'),
+    orderNo: 100000,
+  },
+  children: [
+    {
+      path: '',
+      name: 'systemQiankun',
+      component: () => import('/@/views/sys/qiankun/index.vue'),
+      // component: () => import('/@/views/dashboard/workbench/index.vue'),
+      meta: {
+        title: t('routes.dashboard.about'),
+        icon: 'simple-icons:about-dot-me',
+        hideMenu: true,
+      },
+    },
+  ],
+};
 // Basic routing without permission
 export const basicRoutes = [
   LoginRoute,
+  SystemLoginRoute,
+  systemRoute,
+  // SystemDashboardRoute,
   RootRoute,
   ...mainOutRoutes,
   REDIRECT_ROUTE,
